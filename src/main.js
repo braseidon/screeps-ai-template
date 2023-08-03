@@ -1,7 +1,8 @@
+const _global = require('global');
+const roomvisual = require('lib_RoomVisual');
 let creepLogic = require('creeps_index');
 let roomLogic = require('room_index');
 let prototypes = require('prototypes_index');
-
 
 module.exports.loop = function () {
     // make a list of all of our rooms
@@ -20,8 +21,8 @@ module.exports.loop = function () {
         }
     }
 
-    // free up memory if creep no longer exists
-    for(let name in Memory.creeps) {
+    // Free up dead creeps from memory
+    for(var name in Memory.creeps) {
         if(!Game.creeps[name]) {
             delete Memory.creeps[name];
             console.log('Clearing non-existing creep memory:', name);

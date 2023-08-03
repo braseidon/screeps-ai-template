@@ -1,6 +1,6 @@
 global.C = {
     USERNAME: 'ShutteR',
-    SIGN_TEXT: 'A little mutation?',
+    SIGN_TEXT: 'Why fart and waste it when you can burp and taste it',
     OWNED_ROOM: 'owned room',
     EXTERNAL_ROOM: 'external room',
     HIGH_WAY: 'high way',
