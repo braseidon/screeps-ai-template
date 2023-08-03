@@ -1,0 +1,5 @@
+⛽ fill
+🚧 build
+⚡ energy
+🔄 harvest
+🛠️ repair
