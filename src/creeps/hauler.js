@@ -24,8 +24,12 @@ mod.run = function(creep) {
 
         const closestSpawn = creep.pos.findClosestByRange(spawns);
 
-        if(creep.transfer(closestSpawn, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-            creep.moveTo(closestSpawn, { visualizePathStyle: { stroke: '#ffaa00' } });
+        if (closestSpawn.store.getFreeCapacity() !== 0) {
+            if(creep.transfer(closestSpawn, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                creep.moveTo(closestSpawn, { visualizePathStyle: { stroke: '#ffaa00' } });
+            }
+        } else {
+            //
         }
     }
 };

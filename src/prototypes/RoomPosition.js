@@ -1,4 +1,4 @@
-RoomPosition.prototype.getNearbyPositions = function getNearbyPositions() {
+RoomPosition.prototype.getNearbyPositions = function() {
     //
     var positions = [];
 
@@ -19,7 +19,7 @@ RoomPosition.prototype.getNearbyPositions = function getNearbyPositions() {
 //     creep.moveTo(found[0]);
 // }
 
-RoomPosition.prototype.getOpenPositions = function getOpenPositions() {
+RoomPosition.prototype.getOpenPositions = function() {
     let nearbyPositions = this.getNearbyPositions();
 
     let terrain = Game.map.getRoomTerrain(this.roomName);

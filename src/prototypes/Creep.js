@@ -1,3 +1,3 @@
-Creep.prototype.sayHello = function sayHello() {
+Creep.prototype.sayHello = function() {
     this.say("wtf am i", true);
 };

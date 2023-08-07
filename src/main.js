@@ -1,54 +1,48 @@
 const _global = require('global');
 const _roomvisual = require('lib_RoomVisual');
-let creepLogic = require('creeps_index');
 // const {Roles} = require('creeps_template');
-let roomLogic = require('room_index');
+let RoomManager = require('room_index');
 let prototypes = require('prototypes_index');
 let pixels = require('util_pixels');
-global.tickLimit = cpuLimit();
-global.load = Math.round(Game.cpu.getUsed());
 
 module.exports.loop = function () {
     // make a list of all of our rooms
     Memory.myRooms = _(Game.rooms).filter(r => r.controller && r.controller.level > 0 && r.controller.my).map((r) => r.name).value();
     // Memory.myRooms = roomList;
-    // console.log(JSON.stringify(Memory.myRooms));
+    // Logger.debug(JSON.stringify(Game.rooms));
     // check memory for each room
     Memory.time = Game.time;
-    Memory.tickLimit = global.tickLimit;
-    Memory.load = global.load;
 
-    for (const roomName of Memory.myRooms) {
-        if (Game.rooms[roomName].memory == undefined) {
-            Game.rooms[roomName].memoryReset();
-        } else {
-            Game.rooms[roomName].memoryUpdate();
-        }
-    }
+    // run logic for each room in our empire
+    _.forEach(Memory.myRooms, function(roomName) {
+        let room = Game.rooms[roomName];
+        // Logger.info(JSON.stringify(room));
 
-    // run spawn logic for each room in our empire
-    _.forEach(Game.myRooms, r => roomLogic.spawning.spawnCreeps(r));
-    
-    // run each creep role see /creeps/index.js
-    for(let name in Game.creeps) {
-        let creep = Game.creeps[name];
-
-        let role = creep.memory.role;
-        if (creepLogic[role]) {
-            creepLogic[role].run(creep);
-        }
-    }
+        try { RoomManager.memory.run(room); } catch (e) { Logger.fatal("*ERROR* Memory Manager loop\n" + e.stack); }
+        // try { RoomManager.creeps.run(room); } catch (e) { Logger.fatal("*ERROR* with Creeps Manager loop\n" + e.stack); }
+        // try { RoomManager.spawning.run(room); } catch (e) { Logger.fatal("*ERROR* with Spawning Manager loop\n" + e.stack); }
+    });
 
     // free up memory if creep no longer exists
     for(let name in Memory.creeps) {
         if(!Game.creeps[name]) {
             delete Memory.creeps[name];
-            console.log('Clearing non-existing creep memory:', name);
+            Logger.debug('Clearing non-existing creep memory:', name);
         }
     }
 
     // Pixels
     // pixels.generate();
+
+    // CPU Info
+    const cpuLimit = Game.cpu.limit;
+    const currentCPUUsed = Game.cpu.getUsed();
+    const currentIdleCPU = cpuLimit - currentCPUUsed;
+    Memory.stats = {
+        cpu_limit: cpuLimit,
+        cpu_used: currentCPUUsed,
+        cpu_idle: currentIdleCPU,
+    };
 };
 
 /**

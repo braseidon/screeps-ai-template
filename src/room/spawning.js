@@ -4,30 +4,58 @@ let creepTypes = _.keys(creepLogic);
 var mod = {};
 module.exports = mod;
 
-mod.spawnCreeps = function(room) {
-    // lists all the creep types to console
-    _.forEach(creepTypes, type => console.log(type));
+mod.run = function(room) {
+    Logger.section('Spawning Manager');
 
-    // find a creep type that returns true for the .spawn() function
+    // Get all the creeps in the room
+   let creeps = room.findMyCreeps();
+   Logger.info(`Current creeps: ${creeps.length} | Roles to check for spawn: ${creepTypes}`);
+
+    // find creep types that returns true for the .spawn() function
     let creepTypeNeeded = _.find(creepTypes, function(type) {
-        let needsSpawn = creepLogic[type].needsSpawn(room);
-        console.log(this.roleName + ' | count: ' + creeps.length + ' | needed: ' + needsSpawn);
+        let creepType = creepLogic[type];
+        let needsSpawn = creepType.needsSpawn(room);
+        Logger.debug(`Need ${type}? ${needsSpawn}`);
+
+        if (! needsSpawn) {
+            return false;
+        }
+
+        // get the data for spawning a new creep of creepTypeNeeded
+        let creepSpawnData = creepType && creepType.spawnData(room);
+        Logger.debug('New creep spawndata: ', JSON.stringify(creepSpawnData));
+
+        if (creepSpawnData) {
+            // find the first or 0th spawn in the room
+            let spawn = room.find(FIND_MY_SPAWNS)[0];
+            let spawnBody = mod.stringToParts(creepSpawnData.body);
+            let result = spawn.spawnCreep(spawnBody, creepSpawnData.name, {memory: creepSpawnData.memory});
+
+            Logger.debug('Spawning: ' + creepType + ' | body: ' + spawnBody + ' | result: ' + result);
+        }
 
         return needsSpawn;
     });
+};
 
-    // get the data for spawning a new creep of creepTypeNeeded
-    let creepSpawnData = creepLogic[creepTypeNeeded] && creepLogic[creepTypeNeeded].spawnData(room);
-    console.log('New creep spawndata: ', JSON.stringify(creepSpawnData));
+// returns an object with the data to spawn a new creep
+mod.spawnData = function() {
+    let name = this.roleName + Game.time;
+    let body = this.settings.bodyString;
+    let memory = {
+        role: this.roleName,
+        // time: Game.time,
+        routing: {
+            targetRoom: this.settings.targetRoom,
+            targetId: this.settings.targetId,
+        }
+    };
 
-    if (creepSpawnData) {
-        // find the first or 0th spawn in the room
-        let spawn = room.find(FIND_MY_SPAWNS)[0];
-        let spawnBody = mod.stringToParts(creepSpawnData.body);
-        let result = spawn.spawnCreep(spawnBody, creepSpawnData.name, {memory: creepSpawnData.memory});
-    
-        console.log('Spawning: ' + creepTypeNeeded + ' | body: ' + spawnBody + ' | result: ' + result);
-    }
+    return {
+        name: name,
+        body: body,
+        memory
+    };
 };
 
 /**
@@ -77,3 +105,20 @@ mod.stringToParts = function(stringParts) {
     }
     return arrayParts;
 };
+
+/**
+ * Creep part data
+ *
+ * @class
+ */
+class CreepPartData {
+  /**
+   * constructor
+   */
+  constructor() {
+    this.fail = false;
+    this.cost = 0;
+    this.parts = [];
+    this.len = 0;
+  }
+}

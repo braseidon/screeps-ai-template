@@ -81,3 +81,5 @@ global.Util = {
     Logger: require('util_logger'),
     Helpers: require('util_helpers'),
 };
+global.Logger = Util.Logger;
+global.massSuicide = _.forEach(Game.rooms, r => function(r){ r.suicideAllCreeps()});
