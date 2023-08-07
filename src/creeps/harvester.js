@@ -3,7 +3,7 @@ module.exports = mod;
 
 mod.settings = {
     bodyString: 'WWM',
-    pop: false,
+    pop: 2,
     minEnergy: 0,
 };
 
@@ -36,13 +36,15 @@ mod.run = function(creep) {
 
 // Max harvesters needed is equal to the number of sources
 mod.getPopNeeded = function(room) {
-    let sources = room.findSources();
-    Logger.trace(`Room ${room.name} has ${sources.length} sources`);
+    let popNeeded = [];
+    let sources = room.memory.sources;
+    Logger.debug(`Room ${room.name} has ${sources.length} sources ${JSON.stringify(sources)}`);
 
     let creepsNeeded = [];
     let sourceCreeps = [];
 
     sources.forEach(source => {
+        // Logger.debug(`sourceid ${source}`);
         sourceCreeps = room.find(FIND_MY_CREEPS, {
             filter: (object) => object.memory &&
                 object.memory.role === this.roleName &&

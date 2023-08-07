@@ -14,22 +14,24 @@ mod.run = function(room) {
     // find creep types that returns true for the .spawn() function
     let creepTypeNeeded = _.find(creepTypes, function(type) {
         let creepType = creepLogic[type];
-        let needsSpawn = creepType.needsSpawn(room);
-        Logger.debug(`Need ${type}? ${needsSpawn}`);
+        let getSpawnRequests = creepType.getSpawnRequests(room);
+        // let needsSpawn = creepType.needsSpawn(room);
+        Logger.debug(`Need ${type}? ${getSpawnRequests.length < 1}`);
 
-        if (! needsSpawn) {
+        if (! getSpawnRequests || getSpawnRequests.length < 1) {
             return false;
         }
 
         // get the data for spawning a new creep of creepTypeNeeded
-        let creepSpawnData = creepType && creepType.spawnData(room);
-        Logger.debug('New creep spawndata: ', JSON.stringify(creepSpawnData));
 
-        if (creepSpawnData) {
+        Logger.debug(`getSpawnRequests count: ${getSpawnRequests.length}, data: ${getSpawnRequests}`);
+        // let spawnData = mod.spawnData(creepType);
+        Logger.error(`Spawning.js Data - name: ${spawnData.name}, body: ${spawnData.body}, cost: ${spawnData.cost}, memory: ${JSON.stringify(spawnData.memory)}`);
+
+        if (spawnData && 1 == 2) {
             // find the first or 0th spawn in the room
             let spawn = room.find(FIND_MY_SPAWNS)[0];
-            let spawnBody = mod.stringToParts(creepSpawnData.body);
-            let result = spawn.spawnCreep(spawnBody, creepSpawnData.name, {memory: creepSpawnData.memory});
+            let result = spawn.spawnCreep(spawnData.body, spawnData.name, {memory: spawnData.memory});
 
             Logger.debug('Spawning: ' + creepType + ' | body: ' + spawnBody + ' | result: ' + result);
         }
@@ -38,23 +40,34 @@ mod.run = function(room) {
     });
 };
 
+mod.checkIfCreepNeeded = function(room, name, body, memory) {
+    //
+};
+
 // returns an object with the data to spawn a new creep
-mod.spawnData = function() {
-    let name = this.roleName + Game.time;
-    let body = this.settings.bodyString;
+mod.spawnData = function(creepType) {
+    // Logger.debug(`mod.spawnData() ---- ${creepType.settings.bodyString}`);
+    let name = creepType.roleName + Game.time;
+    let bObj = mod.stringToBodyData(creepType.settings.bodyString);
+    let body = bObj.body;
+    let cost = bObj.cost;
+    // let cost = mod.bodyCost(body);
     let memory = {
-        role: this.roleName,
+        role: creepType.roleName,
+        bodyString: creepType.settings.bodyString,
+        bodyCost: cost,
         // time: Game.time,
         routing: {
-            targetRoom: this.settings.targetRoom,
-            targetId: this.settings.targetId,
-        }
+            targetRoom: creepType.settings.targetRoom,
+            targetId: creepType.settings.targetId,
+        },
     };
-
+    // Logger.debug(`spawnData() memory ---- ${JSON.stringify(memory)}`);
     return {
         name: name,
         body: body,
-        memory
+        cost: cost,
+        memory: memory,
     };
 };
 
@@ -64,7 +77,7 @@ mod.spawnData = function() {
    * @param {string} stringParts creep parts String
    * @return {undefined|string[]} creep parts array
    */
-mod.stringToParts = function(stringParts) {
+mod.stringToBodyData = function(stringParts) {
     if (!stringParts || typeof (stringParts) !== 'string') {
         return undefined;
     }
@@ -99,11 +112,26 @@ mod.stringToParts = function(stringParts) {
         default:
             // should never enter
             part = MOVE;
-            console.error('stringToParts illegal partChar : ' + part);
+            Logger.error('stringToBodyData illegal partChar : ' + part);
         }
+        // Logger.warning(`New part: ${part}`);
         arrayParts.push(part);
     }
-    return arrayParts;
+    // Logger.warning(`stringToBodyData - ${JSON.stringify(arrayParts)} - typeof ${typeof(arrayParts)}`);
+    let bodyData = {};
+    bodyData.body = arrayParts;
+    bodyData.cost = mod.bodyCost(arrayParts);
+    return bodyData;
+};
+
+mod.bodyCost = function(bodyArray) {
+    let cost = 0;
+    _.each(bodyArray,
+        (p) => {
+            cost += BODYPART_COST[p];
+        },
+    );
+    return cost;
 };
 
 /**

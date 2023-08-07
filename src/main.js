@@ -19,8 +19,8 @@ module.exports.loop = function () {
         // Logger.info(JSON.stringify(room));
 
         try { RoomManager.memory.run(room); } catch (e) { Logger.fatal("*ERROR* Memory Manager loop\n" + e.stack); }
-        // try { RoomManager.creeps.run(room); } catch (e) { Logger.fatal("*ERROR* with Creeps Manager loop\n" + e.stack); }
-        // try { RoomManager.spawning.run(room); } catch (e) { Logger.fatal("*ERROR* with Spawning Manager loop\n" + e.stack); }
+        try { RoomManager.creeps.run(room); } catch (e) { Logger.fatal("*ERROR* with Creeps Manager loop\n" + e.stack); }
+        try { RoomManager.spawning.run(room); } catch (e) { Logger.fatal("*ERROR* with Spawning Manager loop\n" + e.stack); }
     });
 
     // free up memory if creep no longer exists

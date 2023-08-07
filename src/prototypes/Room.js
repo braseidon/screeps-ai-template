@@ -40,13 +40,15 @@ Room.prototype.memoryObjDefault = function() {
 
 Room.prototype.memoryObj = function() {
     // return 'adasdasd';
-    // let sources = this.find(FIND_SOURCES);
+    let roomSources = _.map(this.findSources(), source => source.id) || [];
+    let roomSpawns = _.map(this.findMySpawns(), spawn => spawn.id) || [];
+    // Logger.error(`Room sources: ${roomSources}, Spawns: ${roomSpawns}`);
     return {
         lastSeen: Game.time,
         energyAvailable: this.energyAvailable,
         energyCapacityAvailable: this.energyCapacityAvailable,
-        sources: _.map(this.findSources(), source => source.id) || [],
-        spawns: _.map(this.findMySpawns(), spawn => spawn.id) || [],
+        sources: roomSources,
+        spawns: roomSpawns,
         isSetup: true,
     };
 };
@@ -62,6 +64,21 @@ Room.prototype.suicideAllCreeps = function() {
 
 Room.prototype.findMySpawns = function() {
     return this.find(FIND_MY_SPAWNS);
+};
+
+Room.prototype.findMyCreepsTargetId = function(targetId) {
+    return this.find(FIND_MY_CREEPS, {
+        filter: function(creep) {
+            return creep.memory.routing.targetId == targetId &&
+                creep.memory.routing.targetRoom == this.name;
+        }
+    });
+};
+
+Room.prototype.findMyCreepsOfRole = function(role) {
+    return this.find(FIND_MY_CREEPS, {
+        filter: (object) => object.memory && object.memory.role === role,
+    });
 };
 
 Room.prototype.findMyCreeps = function() {

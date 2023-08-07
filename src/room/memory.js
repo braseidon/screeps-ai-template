@@ -2,7 +2,7 @@ var mod = {};
 module.exports = mod;
 
 mod.run = function(room) {
-    Logger.section(`Room Memory '${room.name}' Initializing`);
+    // Logger.section(`Room Memory '${room.name}' Initializing`);
     // let room = Game.rooms[roomName];
 
     if (! room.memory.isSetup || room.memory.isSetup == false) {

@@ -6,16 +6,22 @@ let mod = function(roleName) {
         bofore: [],
         after: []
     };
-    this.defaultSettings = {
+    this.defaultMemory = {
         bodyString: '', // MWC
+        bodyCost: 0,
         pop: 0,
         minEnergy: 0,
+        routing: {
+            targetId: '',
+            targetRoom: '',
+        },
+        slug: '',
         // inStack: [Action.Back, Action.Harvest],
-        inStack: [],
+        // inStack: [],
         //aka link-mining, container-mining and drop-mining
         // outStack: [Action.PutToLink, Action.Put, Action.Drop],
-        outStack: [],
-        param: ['controller.level', 'energyAvailable'],
+        // outStack: [],
+        // param: ['controller.level', 'energyAvailable'],
         // minPop: 4,
         // amount: {
         //     1: [2, 1, 1],
@@ -55,12 +61,12 @@ let mod = function(roleName) {
     };
 
     // Returns true if this creep needs to spawn another
-    this.needsSpawn = function(room) {
+    this.getSpawnRequests = function(room) {
         var creeps = _.filter(Game.creeps, (creep) => creep.memory.role == this.roleName && creep.room.name == room.name);
         // console.log(JSON.stringify(this.settings));
         let popNeeded = this.getPopNeeded(room);
 
-        Logger.debug(`Creep Type: ${this.roleName} | Current: ${creeps.length} | Needed: ${popNeeded} | Min Energy: ${this.settings.minEnergy}`);
+        Logger.info(`Creep Type: ${this.roleName} | Current: ${creeps.length} | Needed: ${popNeeded} | Min Energy: ${this.settings.minEnergy}`);
 
 
         if (popNeeded !== false) {
@@ -80,7 +86,13 @@ let mod = function(roleName) {
     // Get needed creep population total
     // Meant to be extended
     this.getPopNeeded = function(room) {
-        return this.settings.pop;
+        let pop = this.settings.pop;
+
+    };
+
+    // The slug to identify this creep in the room/queue memory
+    this.getSpawnSlug = function(targetRoom, targetId) {
+        return _.join([this.roleName, this.targetRoom, this.targetId], '-');
     };
 
     // returns an object with the data to spawn a new creep
@@ -101,13 +113,13 @@ let mod = function(roleName) {
 
     // To be run on each extension
     this.updateSettings = function() {
-        Logger.trace(`Creep Role ${this.roleName} update settings, default: ${JSON.stringify(this.defaultSettings)}`);
+        Logger.trace(`Creep Role ${this.roleName} update settings, default: ${JSON.stringify(this.defaultMemory)}`);
         // settings = this.settings;
         if (typeof(this.settings) !== 'object') {
             Logger.error(`Role ${this.roleName} updateSettings() function called with this.settings as a non-object`);
-            return this.defaultSettings;
+            return this.defaultMemory;
         }
-        this.settings = _.defaults(this.settings, this.defaultSettings);
+        this.settings = _.defaults(this.settings, this.defaultMemory);
 
         Logger.trace(`Creep Role ${this.roleName} update settings, merged: ${JSON.stringify(this.settings)}`);
     };

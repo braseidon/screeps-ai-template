@@ -36,7 +36,7 @@ function Logger() {
     };
     this.error = function(message) {
         if(this.logLevel <= LogLevel['error']) {
-            console.log(`<font color="purple">[ERROR] ${message}</font>`);
+            console.log(`<font color="orange">[ERROR] ${message}</font>`);
         }
     };
     this.fatal = function(message) {
