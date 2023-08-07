@@ -1,7 +1,8 @@
 let mod = {
-    builder:    require('creeps_builder'),
+    // builder:    require('creeps_builder'),
     harvester:  require('creeps_harvester'),
-    upgrader:   require('creeps_upgrader'),
+    hauler:     require('creeps_hauler'),
+    // upgrader:   require('creeps_upgrader'),
 };
 
 module.exports = mod;

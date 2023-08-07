@@ -1,0 +1,96 @@
+var mod = {};
+module.exports = mod;
+
+mod.Roles = function() {
+    return {
+        'harvester':  {
+            'name': 'harvester',
+            'body': [WORK, CARRY, MOVE, MOVE],
+            'limit': 6
+        },
+        'builder':    {
+            'name': 'builder',
+            'body': [WORK, CARRY, MOVE, MOVE],
+            'limit': 4
+        },
+        'upgrader':   {
+            'name': 'upgrader',
+            'body': [WORK, CARRY, MOVE, MOVE],
+            'limit': 2
+        },
+        'sourcer':    {
+            'name': 'sourcer',
+            'body': [WORK, WORK, MOVE],
+            'limit': 2
+        },
+        'repairer':   {
+            'name': 'repairer',
+            'body': [WORK, CARRY, MOVE, MOVE],
+            'limit': 2
+        },
+        'guard':      {
+            'name': 'guard',
+            'body': [ATTACK, MOVE],
+            'limit': 4
+        },
+    };
+};
+
+// setupRoles: function() {
+//     this.Role = {
+//         harvester:  this.create('harvester',
+//             [WORK, CARRY, MOVE, MOVE],
+//             6),
+//         builder:    this.create('builder',
+//             [WORK, CARRY, MOVE, MOVE],
+//             2),
+//         upgrader:   this.create('upgrader',
+//             [WORK, CARRY, MOVE, MOVE],
+//             2),
+//         sourcer:    this.create('sourcer',
+//             [WORK, WORK, MOVE],
+//             6),
+//         repairer:   this.create('repairer',
+//             [WORK, CARRY, MOVE, MOVE],
+//             6),
+//         guard:      this.create('guard',
+//             [ATTACK, MOVE],
+//             4),
+//     };
+// },
+
+/**
+ * Create a creep type
+ *
+ * @param  {string} name  [description]
+ * @param  {array} body  [description]
+ * @param  {int} limit [description]
+ * @return {obj}       [description]
+ */
+mod.create = function(name, body, limit = 2) {
+    return {
+        name:  name,
+        body:  body,
+        limit: limit,
+    };
+};
+
+/**
+ * Return the Roles object
+ *
+ * @return {obj}
+ */
+// getRoles: function() {
+//     console.log('spawning_template - getRoles - ' + this.Roles);
+//     return this.Roles;
+// };
+
+/**
+ * Check if a role key exists
+ *
+ * @param  {string}  checkRole
+ * @return {Roles}           or false if doesnt exist
+ */
+mod.isRole = function(checkRole) {
+    return this.Roles[checkRole] ? this.Roles[checkRole] : false;
+};

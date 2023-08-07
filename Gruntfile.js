@@ -5,6 +5,7 @@ module.exports = function(grunt) {
     var password = grunt.option('password') || config.password;
     var branch = grunt.option('branch') || config.branch;
     var local_path = grunt.option('local.local_path') || config.local.local_path;
+    var official_path = grunt.option('official.local_path') || config.official.local_path;
     var ptr = grunt.option('ptr') ? true : config.ptr;
 
     grunt.loadNpmTasks('grunt-screeps');
@@ -55,6 +56,16 @@ module.exports = function(grunt) {
                     }
                 }],
             },
+            // Copy the Types helper file
+            tools: {
+                files: [{
+                    cwd: './',
+                    src: ['node_modules/@types/screeps/*.d.ts'],
+                    dest: './',
+                    filter: 'isFile',
+                    expand: true
+                }]
+            }
         },
 
         // Copy files to the folder the client uses to sync to the local server.
@@ -69,6 +80,12 @@ module.exports = function(grunt) {
                 options: {
                     src: './dist/',
                     dest: local_path,
+                }
+            },
+            official: {
+                options: {
+                    src: './dist/',
+                    dest: official_path,
                 }
             },
         },
@@ -87,4 +104,6 @@ module.exports = function(grunt) {
 
     grunt.registerTask('default',  ['clean', 'copy:screeps', 'screeps']);
     grunt.registerTask('local',  ['clean', 'copy:screeps', 'rsync:local']);
-}
+    grunt.registerTask('official',  ['clean', 'copy:screeps', 'rsync:official']);
+    grunt.registerTask('tools',  ['copy:tools']);
+};

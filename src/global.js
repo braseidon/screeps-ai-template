@@ -73,6 +73,8 @@ global.C = {
 };
 
 const DefaultConfig = require('config_default');
+// Prefab objects
+global.RoleObj = require('creeps_obj');
 
 //Shorthand
 global.Util = {
