@@ -12,19 +12,20 @@ mod.run = function(room) {
     Logger.info(`Current creeps: ${creeps.length} | Roles to check for spawn: ${creepTypes}`);
 
     // Get all Roles' jobs, and check each job for openings
-    let getCreepJobs = [];
+    let creepSpawnRequests = [];
 
+    // Loop all the creep roles, getting an array of job requests for each one
     _.forEach(creepTypes, (type) => {
         let creepType = creepLogic[type];
         let jobs = creepType.getCreepJobs(room);
         // Logger.error(`jobs: ${jobs.length}, data: `);
-        getCreepJobs.push(jobs);
-
-        Logger.error(`${type} :: jobs: ${jobs.length}, taken: ?, available: ?, data: ${JSON.stringify(jobs)}`);
-
+        creepSpawnRequests.push(...jobs);
+        let slugsArr = _(jobs).map((job) => job.memory.routing.slug);
+        Logger.error(`${type} :: jobs: ${jobs.length}, taken: ?, available: ?, data: ${slugsArr}`);
+    });
         // let slugs = [];
         // let openJobs = [];
-        // getCreepJobs.forEach((j) => {
+        // creepSpawnRequests.forEach((j) => {
         //     if(_.has(j, 'memory.routing.slug')) {
         //         let slug = j.memory.routing.slug;
         //         Logger.debug(`${slug}`);
@@ -37,9 +38,19 @@ mod.run = function(room) {
         //     }
         // });
         // let getOpenJobs = mod.checkJobBeforeQueueing(room, slug);
-    });
 
-    Logger.error(`Jobs Arr ${getCreepJobs.length}`);
+
+    if (creepSpawnRequests.length > 0) {
+        let spawn = Game.getObjectById(room.spawns[0]);
+        let creepSpawn = creepSpawnRequests[0];
+        Logger.error(`first spawn in queue: ${JSON.stringify(creepSpawn)}`);
+    }
+
+    // _.forEach(creepSpawnRequests, (spawnRequest) => {
+
+    // });
+
+    // Logger.error(`creepSpawnRequests length: ${creepSpawnRequests.length}, data: ${JSON.stringify(creepSpawnRequests)}`);
 
     // find creep types that returns true for the .spawn() function
     if(1 == 2) {
@@ -72,27 +83,10 @@ mod.run = function(room) {
     }
 };
 
-// The slug to identify this creep in the room/queue memory
-// mod.creepSlug = function(roleName, targetRoomName, targetId) {
-//     return _.join([roleName, targetRoomName, targetId], '-');
-// };
+mod.queue = function(slug) {
+    //
+};
 
-mod.checkJobBeforeQueueing = function(room, slug) { // roleName, targetRoomName, targetId
-    // let type = creepTypes[roleName];
-    // let slug = type.creepSlug(targetRoomName, targetId);
-    // let room = Game.rooms[targetRoomName];
-    // let roomCreeps = room.findRoomCreepsBySlug(slug);
-    // let queueCreeps = room.findQueueCreepsBySlug(slug);
-    if (room.findRoomCreepsBySlug(slug) || room.findQueueCreepsBySlug(slug)) {
-        return false;
-    }
-
-    let arrConcat = _.concat(roomCreeps, queueCreeps);
-    Logger.error(`All creeps found: ${arrConcat.length}, data: ${JSON.stringify(arrConcat)}`);
-
-    if(arr.concat.length < 1) {
-        return false;
-    }
-
-    return arrConcat;
+mod.spawn = function(room) {
+    if (room.memory.queue)
 };

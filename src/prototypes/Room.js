@@ -1,22 +1,48 @@
-Room.prototype.inQueue = function(creepMemory) {
-  this.memory.queue = this.memory.queue || [];
-  for (const item of this.memory.queue) {
-    if (this.isSameCreep(creepMemory, item)) {
-      return true;
+// The slug to identify this creep in the room/queue memory
+// mod.creepSlug = function(roleName, targetRoomName, targetId) {
+//     return _.join([roleName, targetRoomName, targetId], '-');
+// };
+
+Room.prototype.getAllCreepsBySlug = function(slug) { // roleName, targetRoomName, targetId
+    // let type = creepTypes[roleName];
+    // let slug = type.creepSlug(targetRoomName, targetId);
+    // let room = Game.rooms[targetRoomName];
+    const roomCreeps = this.creepsInRoomBySlug(slug) || [];
+    const queueCreeps = this.creepsInQueueBySlug(slug) || [];
+    if (roomCreeps.length === 0 && queueCreeps.length === 0) {
+        Logger.debug(`No creeps found in room/queue for slug "${slug}"`);
+        return [];
     }
-  }
-  return false;
+
+    let allCreeps = _.concat(roomCreeps, queueCreeps);
+    Logger.error(`All creeps found: ${allCreeps.length}, data: ${JSON.stringify(allCreeps)}`);
+
+    if(arr.concat.length < 1) {
+        return false;
+    }
+
+    return allCreeps;
+};
+
+Room.prototype.inQueue = function(spawnData) {
+    this.memory.queue = this.memory.queue || [];
+    for (const item of this.memory.queue) {
+        if (this.isSameCreep(spawnData, item)) {
+            return true;
+        }
+    }
+    return false;
 };
 
 Room.prototype.findMySpawns = function() {
     return this.find(FIND_MY_SPAWNS);
 };
 
-Room.prototype.findQueueCreepsBySlug = function(slug) {
+Room.prototype.creepsInQueueBySlug = function(slug) {
     return _.filter(this.memory.spawnQueue, (c) => c.memory.routing.slug == slug);
 };
 
-Room.prototype.findRoomCreepsBySlug = function(slug) {
+Room.prototype.creepsInRoomBySlug = function(slug) {
     return this.find(FIND_MY_CREEPS, {
         filter: function(creep) {
             return creep.memory.routing.slug == slug;

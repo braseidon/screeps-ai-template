@@ -1,11 +1,23 @@
+let prototypes = require('prototypes_index');
+// Any modules that you use that modify the game's prototypes should be require'd
+// before you require the profiler.
+const profiler = require('screeps-profiler');
 const _global = require('global');
 const _roomvisual = require('lib_RoomVisual');
 // const {Roles} = require('creeps_template');
 let RoomManager = require('room_index');
-let prototypes = require('prototypes_index');
 let pixels = require('util_pixels');
 
-module.exports.loop = function () {
+// This line monkey patches the global prototypes.
+profiler.enable();
+module.exports.loop = function() {
+    profiler.wrap(function() {
+        // Main.js logic should go here.
+        mainExecute();
+    });
+};
+
+function mainExecute() {
     // make a list of all of our rooms
     Memory.myRooms = _(Game.rooms).filter(r => r.controller && r.controller.level > 0 && r.controller.my).map((r) => r.name).value();
     // Memory.myRooms = roomList;

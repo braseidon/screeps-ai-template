@@ -23,7 +23,7 @@ Room.prototype.memoryObjDefault = function() {
         energyCapacityAvailable: 0,
         sources: [],
         spawns: [],
-        spawnQueue: {},
+        queue: [],
         isSetup: false,
     };
 };

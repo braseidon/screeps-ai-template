@@ -5,33 +5,33 @@ mod.settings = {
     bodyString: 'WWM',
     minPop: 2,
     minEnergy: 0,
+    perSource: 1,
 };
 
 /** @param {Creep} creep **/
 mod.run = function(creep) {
-    // Logger.debug(`Harvest pop: ${this.settings.pop}`);
-
     if (creep.memory.routing.targetId !== undefined) {
-        Logger.debug(`Creep ${creep.name} needs a source to harvest`);
-        let sources = creep.room.findSources();
+        let source = Game.getObjectById(creep.memory.routing.targetId);
 
-        sources.forEach(function(source) {
-            let matches = creep.room.find(FIND_MY_CREEPS, { filter: (c) =>
-                c.memory.routing.targetId == source.id &&
-                c.memory.role == mod.roleName });
-
-            Logger.debug(`Source matching ${matches.legth} for id ${source.id}`);
-            if (matches == '' || matches.length == 0) {
-                c.memory.routing.targetId = source.id;
-            }
-        });
-
+        if(creep.harvest(source) == ERR_NOT_IN_RANGE) {
+            creep.moveTo(source);
+        }
     }
-    var sources = creep.room.find(FIND_SOURCES);
 
-    if(creep.harvest(sources[0]) == ERR_NOT_IN_RANGE) {
-        creep.moveTo(sources[0]);
-    }
+    // Logger.debug(`Creep ${creep.name} needs a source to harvest`);
+    // let sources = creep.room.findSources();
+
+    // sources.forEach(function(source) {
+    //     let matches = creep.room.find(FIND_MY_CREEPS, { filter: (c) =>
+    //         c.memory.routing.targetId == source.id &&
+    //         c.memory.role == mod.roleName });
+
+    //     Logger.debug(`Source matching ${matches.legth} for id ${source.id}`);
+    //     if (matches == '' || matches.length == 0) {
+    //         c.memory.routing.targetId = source.id;
+    //     }
+    // });
+    // var sources = creep.room.find(FIND_SOURCES);
 };
 
 // Max harvesters needed is equal to the number of sources
@@ -42,7 +42,13 @@ mod.getCreepJobs = function(room) {
     let jobs = [];
 
     sources.forEach(source => {
-        jobs.push(this.spawnData(room.name, source));
+        // Push jobs based on this.settings.perSource (1 to start)
+        let perSource = (sources.length * this.settings.perSource);
+        // Logger.debug(`PerSource: ${perSource}`);
+
+        for (let x = 1;x < perSource;x++) {
+            jobs.push(this.spawnData(room.name, source));
+        }
         // Logger.debug(`sourceid ${source}`);
         // sourceCreeps = room.find(FIND_MY_CREEPS, {
         //     filter: (object) => object.memory &&
@@ -52,6 +58,7 @@ mod.getCreepJobs = function(room) {
     });
     // Logger.debug(`harvester jobs: ${this.jobs.length}, data: ${JSON.stringify(jobs)}`);
     this.jobs = jobs;
+
     return this.jobs;
 };
 

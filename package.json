@@ -9,5 +9,10 @@
     "grunt-contrib-watch": "^1.1.0",
     "grunt-rsync": "^3.0.0",
     "grunt-screeps": "^1.5.0"
-  }
+  },
+  "globals": [
+    "_",
+    "Game",
+    "Memory"
+  ]
 }

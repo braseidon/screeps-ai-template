@@ -5,6 +5,7 @@ mod.settings = {
     bodyString: 'MMCC',
     minPop: 4,
     minEnergy: 0,
+    perSource: 1,
 };
 
 /** @param {Creep} creep **/

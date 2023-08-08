@@ -2,10 +2,6 @@
 
 let mod = function(roleName) {
     this.roleName = roleName;
-    this.commonRoleConfig = {
-        bofore: [],
-        after: []
-    };
     this.defaultMemory = {
         bodyString: '', // MWC
         bodyCost: 0,
@@ -58,13 +54,13 @@ let mod = function(roleName) {
 
         if (minPop > 0) {
             for (let x = 0;x < minPop;x++) {
-                let newJob = this.spawnData(room.name);
                 // let newJob = {role: this.roleName, 'routing': { targetRoom: room.name, targetId: 'asdasd', slug: 'slug' }};
-                jobs.push(newJob);
+                jobs.push(this.spawnData(room.name));
             }
         }
 
         // Logger.debug(`getCreepJobs count: ${jobs.length}, data: ${jobs}`);
+        this.jobs = jobs;
         return jobs;
     };
 
@@ -83,7 +79,7 @@ let mod = function(roleName) {
             bodyString: this.settings.bodyString,
             bodyCost: cost,
             spawned: false,
-            // time: Game.time,
+            born: Game.time,
             routing: {
                 targetRoom: targetRoomName,
                 targetId: targetId,
@@ -94,7 +90,6 @@ let mod = function(roleName) {
         return {
             name: name,
             body: body,
-            cost: cost,
             memory: memory,
         };
     };

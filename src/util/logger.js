@@ -9,7 +9,7 @@ const LogLevel = {
 };
 
 function Logger() {
-    this.logLevel = Memory.logLevel || 2;
+    this.logLevel = Memory.logLevel || 3;
     this.setLogLevel = function(level) {
         Memory.logLevel = level;
         this.logLevel = level;
@@ -23,11 +23,13 @@ function Logger() {
         if(this.logLevel <= LogLevel['debug']) {
             console.log(`<font color="grey">[DEBUG] ${message}</font>`);
         }
+        console.log('loglevel: ' + this.loglevel);
     };
     this.info = function(message) {
         if(this.logLevel <= LogLevel['info']) {
             console.log(`<font color="green">[INFO] ${message}</font>`);
         }
+        console.log('loglevel: ' + this.loglevel);
     };
     this.warning = function(message) {
         if(this.logLevel <= LogLevel['warning']) {
