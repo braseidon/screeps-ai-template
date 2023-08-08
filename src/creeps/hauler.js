@@ -3,7 +3,7 @@ module.exports = mod;
 
 mod.settings = {
     bodyString: 'MMCC',
-    pop: 4,
+    minPop: 4,
     minEnergy: 0,
 };
 

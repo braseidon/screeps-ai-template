@@ -9,49 +9,17 @@ let mod = function(roleName) {
     this.defaultMemory = {
         bodyString: '', // MWC
         bodyCost: 0,
-        pop: 0,
+        minPop: 0,
         minEnergy: 0,
+        spawned: false,
         routing: {
             targetId: '',
             targetRoom: '',
+            slug: '',
         },
-        slug: '',
-        // inStack: [Action.Back, Action.Harvest],
-        // inStack: [],
-        //aka link-mining, container-mining and drop-mining
-        // outStack: [Action.PutToLink, Action.Put, Action.Drop],
-        // outStack: [],
-        // param: ['controller.level', 'energyAvailable'],
-        // minPop: 4,
-        // amount: {
-        //     1: [2, 1, 1],
-        //     2: {
-        //         0: [2, 1, 1],
-        //         550: [4, 3, 1],
-        //         750: [2, 1, 1],
-        //     },
-        // },
-        // maxLayoutAmount: 6,
     };
     this.mergedSettings = {};
-
-    //Util function
-    this.loop0 = function(creep, useOut) {
-        // if(useOut) {
-        //     const stack = this.roleConfig.outStack;
-        //     //If can't process previous action then invoke next
-        //     for(let i=0; i<stack.length; i++) {
-        //         if(stack[i].loop(creep)) return;
-        //     }
-        // }
-        // else {
-        //     const stack = this.roleConfig.inStack;
-        //     for(let i=0; i<stack.length; i++) {
-        //         if(stack[i].loop(creep)) return;
-        //     }
-        // }
-        // _.forEach(this.commonRoleConfig.after, action=>action.loop(creep));
-    };
+    this.jobs = [];
 
     //Default behaviour, can be override
     this.run = function(creep) {
@@ -64,10 +32,9 @@ let mod = function(roleName) {
     this.getSpawnRequests = function(room) {
         var creeps = _.filter(Game.creeps, (creep) => creep.memory.role == this.roleName && creep.room.name == room.name);
         // console.log(JSON.stringify(this.settings));
-        let popNeeded = this.getPopNeeded(room);
+        let popNeeded = this.getCreepJobs(room);
 
-        Logger.info(`Creep Type: ${this.roleName} | Current: ${creeps.length} | Needed: ${popNeeded} | Min Energy: ${this.settings.minEnergy}`);
-
+        Logger.info(`obj.js Creep Type: ${this.roleName} | Current: ${creeps.length} | Needed: ${popNeeded.length} | Min Energy: ${this.settings.minEnergy}`);
 
         if (popNeeded !== false) {
             // If we have less than the population needed and enough energy capacity
@@ -79,36 +46,64 @@ let mod = function(roleName) {
             return false;
         }
 
-        Logger.warning(`${this.roleName} role object returning false for this.getPopNeeded()`);
+        Logger.warning(`${this.roleName} role object returning false for this.getCreepJobs()`);
         return false;
     };
 
     // Get needed creep population total
     // Meant to be extended
-    this.getPopNeeded = function(room) {
-        let pop = this.settings.pop;
+    this.getCreepJobs = function(room) {
+        let minPop = this.settings.minPop;
+        let jobs = [];
 
-    };
+        if (minPop > 0) {
+            for (let x = 0;x < minPop;x++) {
+                let newJob = this.spawnData(room.name);
+                // let newJob = {role: this.roleName, 'routing': { targetRoom: room.name, targetId: 'asdasd', slug: 'slug' }};
+                jobs.push(newJob);
+            }
+        }
 
-    // The slug to identify this creep in the room/queue memory
-    this.getSpawnSlug = function(targetRoom, targetId) {
-        return _.join([this.roleName, this.targetRoom, this.targetId], '-');
+        // Logger.debug(`getCreepJobs count: ${jobs.length}, data: ${jobs}`);
+        return jobs;
     };
 
     // returns an object with the data to spawn a new creep
-    this.spawnDataOld = function() {
+    this.spawnData = function(targetRoomName, targetId) {
+        // Logger.debug(`mod.spawnData() ---- ${this.settings.bodyString}`);
         let name = this.roleName + Game.time;
-        let body = this.settings.bodyString;
+        let bObj = Helpers.bodyStringToArr(this.settings.bodyString);
+        let body = bObj.body;
+        let cost = bObj.cost;
+        targetRoomName = targetRoomName || this.settings.routing.targetRoom;
+        targetId = targetId || this.settings.routing.targetId;
+        // let cost = mod.bodyCost(body);
         let memory = {
             role: this.roleName,
+            bodyString: this.settings.bodyString,
+            bodyCost: cost,
+            spawned: false,
             // time: Game.time,
             routing: {
-                targetRoom: this.settings.targetRoom,
-                targetId: this.settings.targetId,
-            }
+                targetRoom: targetRoomName,
+                targetId: targetId,
+                slug: this.creepSlug(targetRoomName, targetId),
+            },
         };
+        // Logger.debug(`spawnData() memory ---- ${JSON.stringify(memory)}`);
+        return {
+            name: name,
+            body: body,
+            cost: cost,
+            memory: memory,
+        };
+    };
 
-        return {name, body, memory};
+    // The slug to identify this creep in the room/queue memory
+    this.creepSlug = function(targetRoomName, targetId) {
+        let arr = [this.roleName, targetRoomName, targetId];
+        // Logger.debug(`Slug: ${arr.join('-')}`);
+        return arr.join('-');
     };
 
     // To be run on each extension

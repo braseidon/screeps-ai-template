@@ -3,7 +3,7 @@ module.exports = mod;
 
 mod.settings = {
     bodyString: 'WWM',
-    pop: 2,
+    minPop: 2,
     minEnergy: 0,
 };
 
@@ -35,28 +35,28 @@ mod.run = function(creep) {
 };
 
 // Max harvesters needed is equal to the number of sources
-mod.getPopNeeded = function(room) {
-    let popNeeded = [];
+mod.getCreepJobs = function(room) {
     let sources = room.memory.sources;
-    Logger.debug(`Room ${room.name} has ${sources.length} sources ${JSON.stringify(sources)}`);
+    // Logger.debug(`harvester.js Room ${room.name} has ${sources.length} sources ${JSON.stringify(sources)}`);
 
-    let creepsNeeded = [];
-    let sourceCreeps = [];
+    let jobs = [];
 
     sources.forEach(source => {
+        jobs.push(this.spawnData(room.name, source));
         // Logger.debug(`sourceid ${source}`);
-        sourceCreeps = room.find(FIND_MY_CREEPS, {
-            filter: (object) => object.memory &&
-                object.memory.role === this.roleName &&
-                object.memory.routing.targetId == source.id,
-        });
+        // sourceCreeps = room.find(FIND_MY_CREEPS, {
+        //     filter: (object) => object.memory &&
+        //         object.memory.role === this.roleName &&
+        //         object.memory.routing.targetId == source.id,
+        // });
     });
-
-    return sources;
+    // Logger.debug(`harvester jobs: ${this.jobs.length}, data: ${JSON.stringify(jobs)}`);
+    this.jobs = jobs;
+    return this.jobs;
 };
 
 // Max harvesters needed is equal to the number of sources
-// mod.getPopNeeded = function(room) {
+// mod.getCreepJobs = function(room) {
 //     let numSources = room.findSources().length;
 //     Logger.trace(`Room ${room.name} has ${numSources} sources`);
 

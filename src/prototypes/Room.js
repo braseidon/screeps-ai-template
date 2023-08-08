@@ -8,62 +8,20 @@ Room.prototype.inQueue = function(creepMemory) {
   return false;
 };
 
-Room.prototype.memoryUpdate = function() {
-    Logger.trace('Room Prototype: Update');
-    _.assign(this.memory, this.memoryObj());
-};
-
-Room.prototype.memoryReset = function() {
-    Logger.debug('Room Prototype: Reset');
-
-    console.log(JSON.stringify(this.memoryObj()));
-    this.memory = _.defaults(this.memoryObj(), this.memoryObjDefault());
-};
-
-Room.prototype.memoryCleanKeys = function() {
-    //
-    let reference = _.defaults(this.memoryObj(), this.memoryObjDefault());
-};
-
-Room.prototype.memoryObjDefault = function() {
-    return {
-        name: this.name,
-        lastSeen: 0,
-        energyAvailable: 0,
-        energyCapacityAvailable: 0,
-        sources: [],
-        spawns: [],
-        spawnQueue: [],
-        isSetup: false,
-    };
-};
-
-Room.prototype.memoryObj = function() {
-    // return 'adasdasd';
-    let roomSources = _.map(this.findSources(), source => source.id) || [];
-    let roomSpawns = _.map(this.findMySpawns(), spawn => spawn.id) || [];
-    // Logger.error(`Room sources: ${roomSources}, Spawns: ${roomSpawns}`);
-    return {
-        lastSeen: Game.time,
-        energyAvailable: this.energyAvailable,
-        energyCapacityAvailable: this.energyCapacityAvailable,
-        sources: roomSources,
-        spawns: roomSpawns,
-        isSetup: true,
-    };
-};
-
-Room.prototype.suicideAllCreeps = function() {
-    // let creeps = this.findMyCreeps();
-    let creeps = Game.creeps;
-    Logger.fatal(`suciding ${creeps.length} creeps`);
-    for(let creep in creeps) {
-        Game.creeps[creep].suicide();
-    }
-};
-
 Room.prototype.findMySpawns = function() {
     return this.find(FIND_MY_SPAWNS);
+};
+
+Room.prototype.findQueueCreepsBySlug = function(slug) {
+    return _.filter(this.memory.spawnQueue, (c) => c.memory.routing.slug == slug);
+};
+
+Room.prototype.findRoomCreepsBySlug = function(slug) {
+    return this.find(FIND_MY_CREEPS, {
+        filter: function(creep) {
+            return creep.memory.routing.slug == slug;
+        }
+    });
 };
 
 Room.prototype.findMyCreepsTargetId = function(targetId) {
@@ -99,4 +57,13 @@ Room.prototype.findMyStructures = function() {
 
 Room.prototype.findConstructionSites = function() {
     return this.find(FIND_CONSTRUCTION_SITES);
+};
+
+Room.prototype.suicideAllCreeps = function() {
+    // let creeps = this.findMyCreeps();
+    let creeps = Game.creeps;
+    Logger.fatal(`suciding ${creeps.length} creeps`);
+    for(let creep in creeps) {
+        Game.creeps[creep].suicide();
+    }
 };
